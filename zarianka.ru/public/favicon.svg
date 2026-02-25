@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Body (warm brown) -->
+  <ellipse cx="50" cy="65" rx="20" ry="16" fill="#7B6649"/>
+  <!-- Head -->
+  <circle cx="54" cy="38" r="16" fill="#7B6649"/>
+  <!-- Orange-red breast + face patch -->
+  <path d="M 41 43 C 35 51 34 64 39 72 C 43 78 53 80 60 74 C 67 67 67 56 62 48 C 57 41 46 39 41 43 Z" fill="#D4703A"/>
+  <!-- Orange face patch -->
+  <ellipse cx="52" cy="41" rx="10" ry="11" fill="#D4703A"/>
+  <!-- Eye -->
+  <circle cx="61" cy="31" r="5" fill="#1A0F0A"/>
+  <circle cx="62.5" cy="29.5" r="1.6" fill="rgba(255,255,255,0.85)"/>
+  <!-- Beak -->
+  <path d="M 68 36 L 80 33 L 68 30 Z" fill="#3D2B1F"/>
+  <!-- Wing fold -->
+  <path d="M 35 58 Q 27 65 28 74" stroke="#5A4232" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Tail -->
+  <path d="M 32 70 L 22 84 L 33 79 Z" fill="#6B5740"/>
+  <!-- Twig branch -->
+  <path d="M 18 88 Q 50 85 82 88" stroke="#8B7355" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Feet -->
+  <line x1="43" y1="79" x2="43" y2="87" stroke="#5A4232" stroke-width="2"/>
+  <line x1="56" y1="79" x2="56" y2="87" stroke="#5A4232" stroke-width="2"/>
+  <line x1="43" y1="87" x2="37" y2="91" stroke="#5A4232" stroke-width="2"/>
+  <line x1="43" y1="87" x2="49" y2="91" stroke="#5A4232" stroke-width="2"/>
+  <line x1="56" y1="87" x2="50" y2="91" stroke="#5A4232" stroke-width="2"/>
+  <line x1="56" y1="87" x2="62" y2="91" stroke="#5A4232" stroke-width="2"/>
+</svg>
