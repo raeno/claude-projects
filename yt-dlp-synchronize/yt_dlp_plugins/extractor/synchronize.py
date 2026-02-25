@@ -1,7 +1,53 @@
 import re
 
 from yt_dlp.extractor.common import InfoExtractor
-from yt_dlp.utils import ExtractorError, orderedSet
+from yt_dlp.utils import ExtractorError, orderedSet, traverse_obj
+
+
+class KinescopeIE(InfoExtractor):
+    IE_NAME = 'Kinescope'
+    IE_DESC = 'kinescope.io'
+    _VALID_URL = r'https?://kinescope\.io/(?!embed/)(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)'
+
+    def _real_extract(self, url):
+        video_id = self._match_id(url)
+        webpage = self._download_webpage(url, video_id)
+
+        player_options = self._search_json(
+            r'var\s+playerOptions\s*=\s*',
+            webpage, 'player options', video_id,
+        )
+
+        item = traverse_obj(player_options, ('playlist', 0)) or {}
+        uuid = item.get('id') or video_id
+        title = item.get('title') or video_id
+
+        hls_url = traverse_obj(item, ('sources', 'hls', 'src'))
+        if not hls_url:
+            raise ExtractorError('No HLS stream found', expected=True)
+
+        formats, subtitles = self._extract_m3u8_formats_and_subtitles(
+            hls_url, uuid, 'mp4',
+        )
+
+        for vtt in (traverse_obj(item, ('vtt', ...)) or []):
+            lang = vtt.get('srcLang', 'und')
+            subtitles.setdefault(lang, []).append({
+                'url': vtt['src'],
+                'ext': 'vtt',
+                'name': vtt.get('label'),
+            })
+
+        duration = traverse_obj(item, ('meta', 'duration'))
+
+        return {
+            'id': uuid,
+            'title': title,
+            'formats': formats,
+            'subtitles': subtitles,
+            'thumbnail': traverse_obj(item, ('poster', 'src', 'src')),
+            'duration': float(duration) if duration else None,
+        }
 
 
 class SynchronizeLectureIE(InfoExtractor):
@@ -45,7 +91,7 @@ class SynchronizeLectureIE(InfoExtractor):
             default=video_id,
         )
 
-        return self.url_result(kinescope_url, ie='Kinescope', video_title=title)
+        return self.url_result(kinescope_url, ie=KinescopeIE.ie_key(), video_title=title)
 
 
 class SynchronizePlanIE(InfoExtractor):
