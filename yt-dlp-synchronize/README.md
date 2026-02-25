@@ -57,16 +57,26 @@ yt-dlp --cookies-from-browser chrome \
   "https://app.synchronize.ru/listener/educations/192/cohorts/431/plans/493"
 ```
 
-### Download with numbered filenames matching playlist order
+### Download with section prefix in filename
+
+Plans are divided into numbered chapters (e.g. "1. Перед началом курса"). Use `%(chapter)s` to include the section name in the filename:
 
 ```bash
 yt-dlp --cookies-from-browser chrome \
-  -o "%(playlist_index)s - %(title)s.%(ext)s" \
+  -o "%(playlist_index)02d %(chapter)s - %(title)s.%(ext)s" \
   "https://app.synchronize.ru/listener/educations/192/cohorts/431/plans/493"
+```
+
+Example output:
+```
+01 1. Перед началом курса - Перед началом курса.mp4
+02 2. Конструкция: почему здания не падают - 1. Конструкция.mp4
+03 2. Конструкция: почему здания не падают - 2. ГУМ vs Дом Наркомфина.mp4
+...
 ```
 
 ## How it works
 
 1. The plugin fetches the lecture page and extracts the Kinescope embed URL from the `data-kinescope-url-value` attribute.
-2. It delegates actual download to yt-dlp's built-in `Kinescope` extractor.
-3. For plans, it scrapes all lecture links from the plan page and returns them as a playlist.
+2. It fetches the kinescope.io player page and extracts the HLS stream from the embedded `playerOptions` JSON.
+3. For plans, it parses `<section id="chapter-N">` blocks to extract chapters in order, attaching `chapter` and `chapter_number` metadata to each lecture entry.

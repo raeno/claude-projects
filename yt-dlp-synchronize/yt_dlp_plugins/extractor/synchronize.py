@@ -132,22 +132,39 @@ class SynchronizePlanIE(InfoExtractor):
             default=playlist_id,
         )
 
-        # Find all lecture hrefs in the page
-        lecture_pattern = (
+        lecture_href_re = (
             r'href="(/listener/educations/%s/cohorts/%s/plans/%s/lectures/\d+)"'
             % (re.escape(ed_id), re.escape(co_id), re.escape(playlist_id))
         )
-        lecture_hrefs = orderedSet(re.findall(lecture_pattern, webpage))
 
-        if not lecture_hrefs:
-            raise ExtractorError('No lectures found in plan %s' % playlist_id, expected=True)
+        entries = []
+        seen = set()
 
-        entries = [
-            self.url_result(
-                'https://app.synchronize.ru' + href,
-                ie=SynchronizeLectureIE.ie_key(),
+        for chapter_match in re.finditer(
+            r'<section\s+id="chapter-(\d+)"[^>]*>(.*?)</section>',
+            webpage, re.DOTALL,
+        ):
+            chapter_num = int(chapter_match.group(1))
+            chapter_html = chapter_match.group(2)
+
+            chapter_title = self._html_search_regex(
+                r'<span[^>]+lg:text-h4[^>]*>\s*([^<]+?)\s*</span>',
+                chapter_html,
+                'chapter title',
+                default='Chapter %d' % chapter_num,
             )
-            for href in lecture_hrefs
-        ]
+
+            for href in orderedSet(re.findall(lecture_href_re, chapter_html)):
+                if href not in seen:
+                    seen.add(href)
+                    entries.append(self.url_result(
+                        'https://app.synchronize.ru' + href,
+                        ie=SynchronizeLectureIE.ie_key(),
+                        chapter=chapter_title,
+                        chapter_number=chapter_num,
+                    ))
+
+        if not entries:
+            raise ExtractorError('No lectures found in plan %s' % playlist_id, expected=True)
 
         return self.playlist_result(entries, playlist_id, title)
