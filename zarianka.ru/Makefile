@@ -8,7 +8,7 @@ DEPLOY_USER ?= raeno
 DEPLOY_PATH ?= /var/www/zarianka.ru
 DIST_DIR    := dist/
 
-.PHONY: all dev build deploy release clean help
+.PHONY: all dev build optimize deploy release clean help
 
 ## Default target
 all: build
@@ -21,11 +21,16 @@ dev:
 build:
 	mise exec -- npm run build
 
+## Optimize images in public/img/ for web delivery
+optimize:
+	mise exec -- node scripts/optimize-images.mjs
+
 ## Deploy ./dist to nginx server via rsync
 deploy:
 	@echo "→ Deploying to $(SERVER):$(DEPLOY_PATH) ..."
 	rsync -avz --delete \
 		--exclude '.DS_Store' \
+		--chmod=D755,F644 \
 		$(DIST_DIR) $(DEPLOY_USER)@$(SERVER):$(DEPLOY_PATH)/
 	@echo "✓ Done — https://zarianka.ru"
 
@@ -41,6 +46,7 @@ help:
 	@echo ""
 	@echo "  make dev       – start dev server (localhost:4321)"
 	@echo "  make build     – production build → ./dist"
+	@echo "  make optimize  – optimize images in public/img/ in-place"
 	@echo "  make deploy    – rsync ./dist to $(SERVER):$(DEPLOY_PATH)"
 	@echo "  make release   – build + deploy"
 	@echo "  make clean     – remove ./dist"
