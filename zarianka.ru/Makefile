@@ -28,9 +28,9 @@ optimize:
 ## Deploy ./dist to nginx server via rsync
 deploy:
 	@echo "→ Deploying to $(SERVER):$(DEPLOY_PATH) ..."
+	chmod -R a+rX $(DIST_DIR)
 	rsync -avz --delete \
 		--exclude '.DS_Store' \
-		--chmod=D755,F644 \
 		$(DIST_DIR) $(DEPLOY_USER)@$(SERVER):$(DEPLOY_PATH)/
 	@echo "✓ Done — https://zarianka.ru"
 
