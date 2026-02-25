@@ -30,6 +30,20 @@
         jq
         openssh
 
+        # Editors & multiplexers
+        neovim
+        tmux
+
+        # Go runtime
+        go
+
+        # Network diagnostics
+        mtr
+        tcpdump
+
+        # Debugging
+        strace
+
         # Claude Code CLI
         claude-code
 
@@ -67,6 +81,12 @@
         ripgrep
         jq
         openssh
+        neovim
+        tmux
+        go
+        mtr
+        tcpdump
+        strace
         claude-code
         amnezia-vpn
         postgresql_17
