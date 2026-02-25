@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(yt-dlp:*)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}
