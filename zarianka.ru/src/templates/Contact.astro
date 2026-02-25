@@ -1,0 +1,76 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { type CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'pages'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+const { title, description, thumbnail } = entry.data;
+---
+
+<Layout title={title} description={description}>
+  <article class="contact-form page-template">
+    {thumbnail && (
+      <div class="post-content-image">
+        <img src={thumbnail} class="kg-image" alt={title} />
+      </div>
+    )}
+
+    <div class="post-content-body">
+      <Content />
+
+      <h3 id="forms">Написать</h3>
+      <form name="contact" method="POST" data-netlify="true" action="/contact/thanks">
+        <input type="hidden" name="form-name" value="contact" />
+        <p hidden>
+           <label>Не заполняйте это поле: <input name="bot-field" /></label>
+        </p>
+
+        <div class="row gtr-uniform">
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="first-name" id="first-name" placeholder="Имя" required />
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="last-name" id="last-name" placeholder="Фамилия" />
+          </div>
+
+          <div class="col-6 col-12-xsmall">
+            <input type="email" name="email" id="demo-email" placeholder="Email" required />
+          </div>
+          <div class="col-6 col-12-xsmall">
+            <input type="text" name="location" id="location" placeholder="Город" />
+          </div>
+
+          <div class="col-12">
+            <select name="category" id="category">
+              <option value="">— Тема обращения —</option>
+              <option value="General">Общий вопрос</option>
+              <option value="Purchase">Покупка</option>
+              <option value="Commissions">Индивидуальный заказ</option>
+              <option value="Exhibitions">Сотрудничество</option>
+              <option value="Other">Другое</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <textarea name="message" id="message" placeholder="Ваше сообщение" rows="6" required></textarea>
+          </div>
+
+          <div data-netlify-recaptcha="true"></div>
+
+          <div class="col-12">
+            <ul class="actions">
+              <li>
+                <input type="submit" value="Отправить" class="primary" />
+              </li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </article>
+</Layout>
