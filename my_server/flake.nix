@@ -92,5 +92,16 @@
         postgresql_17
       ];
     };
+
+    nixosConfigurations.my-server = nixpkgs.lib.nixosSystem {
+      inherit system;
+      modules = [
+        ./hosts/my-server.nix
+        {
+          nixpkgs.config.allowUnfreePredicate = pkg:
+            builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
+        }
+      ];
+    };
   };
 }
