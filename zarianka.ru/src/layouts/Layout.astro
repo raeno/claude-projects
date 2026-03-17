@@ -14,18 +14,58 @@ export interface Props {
 }
 
 const { title, description } = Astro.props;
+
+const siteTitle = title || "Зарянка";
+const siteDescription = description || "Авторская керамика Юлии Якутовой. Кружки, пиалы, вазы — каждое изделие сделано вручную с любовью.";
+
+// Schema.org LocalBusiness
+const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Зарянка · Zarianka Pots",
+    "description": siteDescription,
+    "url": "https://zarianka.ru",
+    "image": "https://zarianka.ru/img/logo.png",
+    "sameAs": ["https://vk.ru/zarianka_pots"],
+    "founder": {
+        "@type": "Person",
+        "name": "Юлия Якутова"
+    },
+    "knowsAbout": ["Керамика", "Гончарное дело", "Авторская посуда"],
+    "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+            "@type": "Product",
+            "name": "Авторская керамика",
+            "description": "Кружки, пиалы, вазы ручной работы",
+            "material": "Глина, натуральные глазури"
+        }
+    }
+};
 ---
 
 <!doctype html>
 <html lang="ru">
     <head>
         <meta charset="UTF-8" />
-        <meta name="description" content={description || "Clay Theme"} />
-        <meta name="viewport" content="width=device-width" />
+        <meta name="description" content={siteDescription} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/img/logo.png" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
-        <title>{title || "Clay"}</title>
+        <title>{siteTitle}</title>
+
+        <!-- Open Graph -->
+        <meta property="og:title" content={siteTitle} />
+        <meta property="og:description" content={siteDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://zarianka.ru" />
+        <meta property="og:image" content="https://zarianka.ru/img/logo.png" />
+        <meta property="og:locale" content="ru_RU" />
+
+        <!-- Schema.org -->
+        <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+
         <ClientRouter />
         <script is:inline>
             // Theme init
@@ -75,8 +115,6 @@ const { title, description } = Astro.props;
         </script>
 
         <script>
-            import { navigate } from "astro:transitions/client";
-
             function initNav() {
                 const burger = document.querySelector(".nav-burger");
                 const wrapper = document.querySelector(".site-wrapper");
@@ -94,8 +132,6 @@ const { title, description } = Astro.props;
                     const isDark =
                         document.documentElement.getAttribute("data-theme") ===
                         "dark";
-                    // Add logic to animate or swap icons if needed, currently CSS handles visibility? No, added SVGs.
-                    // Simple SVG toggle:
                     const sun = document.querySelector(
                         ".sun-icon",
                     ) as HTMLElement;
@@ -133,15 +169,55 @@ const { title, description } = Astro.props;
                 }
             }
 
-            // Run on view transitions (fires on initial load too)
+            function initScrollReveal() {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add("revealed");
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+                );
+
+                document
+                    .querySelectorAll(".post-card, .fade-in-section")
+                    .forEach((el, i) => {
+                        (el as HTMLElement).style.transitionDelay = `${Math.min(i * 0.08, 0.4)}s`;
+                        observer.observe(el);
+                    });
+            }
+
+            function initBackToTop() {
+                const btn = document.getElementById("back-to-top");
+                if (!btn) return;
+
+                const toggle = () => {
+                    if (window.scrollY > 400) {
+                        btn.classList.add("visible");
+                    } else {
+                        btn.classList.remove("visible");
+                    }
+                };
+
+                window.addEventListener("scroll", toggle, { passive: true });
+                toggle();
+
+                btn.addEventListener("click", () => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            }
+
+            // Run on view transitions
             document.addEventListener("astro:page-load", () => {
                 initNav();
                 initTheme();
+                initScrollReveal();
+                initBackToTop();
             });
 
-            // Re-apply theme on swap to prevent flash?
-            // The is:inline script in head handles the initial check on reload.
-            // astro:after-swap handles verifying state after client-side nav.
             document.addEventListener("astro:after-swap", () => {
                 const theme = localStorage.getItem("theme");
                 if (

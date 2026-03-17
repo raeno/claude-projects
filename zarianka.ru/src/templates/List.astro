@@ -1,11 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PostCard from '../components/PostCard.astro';
 import { type CollectionEntry } from 'astro:content';
 
 interface Props {
   entry: CollectionEntry<'pages'>;
-  items?: any[]; // The list of items to display
+  items?: any[];
   baseSlug?: string;
 }
 
@@ -18,6 +19,8 @@ let postCounter = 0;
 ---
 
 <Layout title={title} description={description}>
+    <Breadcrumbs crumbs={[{ label: title || '' }]} />
+
     {description && (
       <header class="page-head">
         <h2 class="page-head-title">
@@ -25,9 +28,6 @@ let postCounter = 0;
         </h2>
       </header>
     )}
-
-    {/* Content from the index markdown (if any, though legacy work-page didn't show it, only description).
-        But generic List might want it. */}
 
     <div class="post-feed">
         {items.map((post) => {

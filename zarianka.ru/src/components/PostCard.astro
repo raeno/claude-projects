@@ -1,26 +1,36 @@
 ---
 export interface Props {
   count: number;
-  post: any; // using any for now, better to use CollectionEntry
+  post: any;
   slug: string;
 }
 
 const { count, post, slug } = Astro.props;
 const thumbnail = post.data.thumbnail;
 const title = post.data.title;
+const description = post.data.description;
 const isLarge = count % 3 === 0;
 
-// Construct background image style
-const bgStyle = thumbnail ? `background-image: url(${thumbnail});` : '';
 const postClass = `post-card ${isLarge ? 'post-card-large' : ''} ${thumbnail ? 'with-image' : 'no-image'} post`;
 ---
 
-<article class={postClass} style={bgStyle}>
+<article class={postClass}>
   <a href={`/${slug}`} class="post-card-link">
+    {thumbnail && (
+      <img
+        src={thumbnail}
+        alt={title || ''}
+        class="post-card-image"
+        loading="lazy"
+      />
+    )}
     <div class="post-card-content">
       <h2 class="post-card-title">
         {title}
       </h2>
+      {description && (
+        <p class="post-card-desc">{description}</p>
+      )}
     </div>
   </a>
 </article>
@@ -31,14 +41,12 @@ const postClass = `post-card ${isLarge ? 'post-card-large' : ''} ${thumbnail ? '
   position: relative;
   flex: 1 0 auto;
   display: flex;
-  position: relative;
   height: 35vw;
-  background: linear-gradient(135deg, #1f1f1f 0%, #111 100%) center center;
-  background-size: cover;
+  background: var(--color-bg-alt);
   overflow: hidden;
   counter-increment: posts;
-  margin: 1rem;
-  border-radius: 12px;
+  margin: 0.6rem;
+  border-radius: 14px;
 }
 
 @media (max-width: 700px) {
@@ -55,24 +63,35 @@ const postClass = `post-card ${isLarge ? 'post-card-large' : ''} ${thumbnail ? '
 .post-card-link {
   flex: 1 1 auto;
   display: block;
-  text-decoration: none; /* Reset anchor default */
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.post-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.post-card-link:hover .post-card-image {
+  transform: scale(1.04);
 }
 
 .post-card-content {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: absolute;
-  top: 0;
-  right: 0;
   bottom: 0;
   left: 0;
+  right: 0;
+  padding: 4rem 2rem 2rem;
   color: #fff;
-  background: rgba(0, 0, 0, 0.6); /* increased opacity */
-  opacity: 1;
-  transition: opacity 0.5s cubic-bezier(0.33, 0, 0.2, 1);
-  /* Ensure content is strictly centered and readable */
+  background: linear-gradient(to top, var(--color-overlay-hover) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 .post-card.with-image .post-card-content {
@@ -87,24 +106,32 @@ const postClass = `post-card ${isLarge ? 'post-card-large' : ''} ${thumbnail ? '
 
 .post-card-link:hover .post-card-content {
   opacity: 1;
-  transition: opacity 0.3s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 .post-card-title {
   margin: 0;
-  display: inline-block;
-  font-size: 3.4rem;
-  max-width: 70%;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.33, 0, 0.2, 1);
-  text-shadow: 0px 0px 6px black;
+  font-size: 2.4rem;
+  text-align: left;
   font-family: var(--font-sans-serif);
-  font-variant: small-caps;
-  text-transform: lowercase;
-  font-weight: 300;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.post-card-desc {
+  margin: 0.4rem 0 0;
+  font-size: 1.4rem;
+  font-family: var(--font-serif);
+  opacity: 0.85;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* Posts without images */
+.post-card.no-image {
+  background: var(--color-bg-alt);
+}
+
 .post-card.no-image::before {
   display: block;
   content: counter(posts);
@@ -113,25 +140,42 @@ const postClass = `post-card ${isLarge ? 'post-card-large' : ''} ${thumbnail ? '
   right: 5vw;
   font-size: 28vw;
   line-height: 1em;
-  font-weight: var(--font-heavy); /* Needs vars.css */
+  font-weight: var(--font-heavy);
   letter-spacing: -0.1em;
-  color: rgba(0, 0, 0, 0.2);
+  color: var(--color-border);
+  opacity: 0.3;
 }
 
 .post-card.no-image .post-card-content {
+  position: relative;
+  background: none;
+  opacity: 1;
   justify-content: flex-start;
   align-items: flex-start;
   padding: 4vw;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .post-card.no-image .post-card-title {
-  font-size: 5rem;
+  font-size: 4rem;
   line-height: 1.15em;
   text-align: left;
+  color: var(--color-base);
+  text-shadow: none;
+}
+
+.post-card.no-image .post-card-desc {
+  color: var(--color-text-muted);
+  text-shadow: none;
+  font-size: 1.6rem;
 }
 
 .post-card.no-image:hover .post-card-title {
   text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 4px;
 }
 
 @media (max-width: 1200px) {

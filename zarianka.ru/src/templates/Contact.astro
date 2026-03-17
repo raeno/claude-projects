@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { type CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -13,6 +14,7 @@ const { title, description, thumbnail } = entry.data;
 ---
 
 <Layout title={title} description={description}>
+  <Breadcrumbs crumbs={[{ label: title || 'Контакты' }]} />
   <article class="contact-form page-template">
     {thumbnail && (
       <div class="post-content-image">
@@ -24,8 +26,7 @@ const { title, description, thumbnail } = entry.data;
       <Content />
 
       <h3 id="forms">Написать</h3>
-      <form name="contact" method="POST" data-netlify="true" action="/contact/thanks">
-        <input type="hidden" name="form-name" value="contact" />
+      <form name="contact" method="POST" action="/contact/thanks">
         <p hidden>
            <label>Не заполняйте это поле: <input name="bot-field" /></label>
         </p>
@@ -59,8 +60,6 @@ const { title, description, thumbnail } = entry.data;
           <div class="col-12">
             <textarea name="message" id="message" placeholder="Ваше сообщение" rows="6" required></textarea>
           </div>
-
-          <div data-netlify-recaptcha="true"></div>
 
           <div class="col-12">
             <ul class="actions">

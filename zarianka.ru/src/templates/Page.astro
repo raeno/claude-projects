@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { type CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -10,23 +11,11 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 
 const { title, description, thumbnail } = entry.data;
-
-// Image handling: thumbnail is string path to /public/img/...
-// In Astro, if it is in public, just use the path.
-// If imported, use Image component. Legacy used string paths in frontmatter.
 ---
 
 <Layout title={title} description={description}>
+  <Breadcrumbs crumbs={[{ label: title || '' }]} />
   <article class={`post-content ${thumbnail ? '' : 'no-image'}`}>
-    {/* Title and description hidden
-    <header class="post-content-header">
-      <h1 class="post-content-title">{title}</h1>
-    </header>
-
-    {description && (
-      <p class="post-content-excerpt">{description}</p>
-    )}
-    */}
 
     {thumbnail && (
       <div class="post-content-image">
