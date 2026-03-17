@@ -1,9 +1,9 @@
 # Zarianka Pots — Build & Deploy
 # ─────────────────────────────────────────────────────────────
-# Deployment target: nginx on my_server (95.216.27.23)
+# Deployment target: nginx on new_server (135.181.19.101)
 # Override any variable: make deploy SERVER=other_host
 
-SERVER      ?= my_server
+SERVER      ?= new_server
 DEPLOY_USER ?= raeno
 DEPLOY_PATH ?= /var/www/zarianka.ru
 DIST_DIR    := dist/

@@ -16,7 +16,7 @@ label {
     display: block;
     font-size: 0.9em;
     font-weight: var(--font-bold);
-    margin: 0 0 (var(--margin) * 0.5) 0;
+    margin: 0 0 0.5rem 0;
 }
 
 input[type="text"],
@@ -27,16 +27,16 @@ input[type="search"],
 input[type="url"],
 select,
 textarea {
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-radius: var(--radius);
-    border: none;
-    border: solid 1px #131313;
+    border: solid 1px var(--color-border-strong);
     color: inherit;
     display: block;
     outline: 0;
     padding: 0 0.6em;
     text-decoration: none;
     width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input[type="text"]:invalid,
@@ -58,8 +58,8 @@ input[type="search"]:focus,
 input[type="url"]:focus,
 select:focus,
 textarea:focus {
-    border-color: #131313;
-    box-shadow: 0 0 0 1px #131313;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 1px var(--color-focus);
 }
 
 select {
@@ -69,13 +69,13 @@ select {
 }
 
 select option {
-    color: #131313;
+    color: var(--color-base);
     background: var(--color-bg);
 }
 
 select:focus::-ms-value {
-        background-color: transparent;
-    }
+    background-color: transparent;
+}
 
 select::-ms-expand {
     display: none;
@@ -122,9 +122,9 @@ input[type="radio"] + label {
 
 input[type="checkbox"] + label:before,
 input[type="radio"] + label:before {
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-radius: var(--radius);
-    border: solid 1px #131313;
+    border: solid 1px var(--color-border-strong);
     content: '';
     display: inline-block;
     height: calc(var(--height) * 0.6);
@@ -136,16 +136,16 @@ input[type="radio"] + label:before {
 
 input[type="checkbox"]:checked + label:before,
 input[type="radio"]:checked + label:before {
-    background: #000000;
-    border-color: #000000;
-    color: var(--color-bg);
-    content: '✓';
+    background: var(--color-btn-bg);
+    border-color: var(--color-btn-bg);
+    color: var(--color-btn-text);
+    content: '\2713';
 }
 
 input[type="checkbox"]:focus + label:before,
 input[type="radio"]:focus + label:before {
-    border-color:  #0000008e;
-    box-shadow: 0 0 0 1px  #0000008e;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 1px var(--color-focus);
 }
 
 

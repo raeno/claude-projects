@@ -1,0 +1,82 @@
+---
+export interface Crumb {
+    label: string;
+    href?: string;
+}
+
+export interface Props {
+    crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+---
+
+{crumbs.length > 0 && (
+    <nav class="breadcrumbs" aria-label="Навигация по сайту">
+        <ol>
+            <li><a href="/">Главная</a></li>
+            {crumbs.map((crumb, i) => (
+                <li>
+                    <svg class="breadcrumb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    {crumb.href && i < crumbs.length - 1 ? (
+                        <a href={crumb.href}>{crumb.label}</a>
+                    ) : (
+                        <span aria-current="page">{crumb.label}</span>
+                    )}
+                </li>
+            ))}
+        </ol>
+    </nav>
+)}
+
+<style>
+.breadcrumbs {
+    margin: 0 0 2rem;
+    padding-left: 2px;
+}
+
+.breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans-serif);
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    color: var(--color-text-muted);
+}
+
+.breadcrumbs li {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.breadcrumb-chevron {
+    margin: 0 0.4rem;
+    opacity: 0.3;
+    flex-shrink: 0;
+}
+
+.breadcrumbs a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 2px 0;
+}
+
+.breadcrumbs a:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.breadcrumbs [aria-current="page"] {
+    color: var(--color-base);
+    font-weight: 400;
+}
+</style>

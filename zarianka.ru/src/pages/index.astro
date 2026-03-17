@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
 import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
@@ -23,32 +24,38 @@ const posts = allContent.filter(item => {
 
 // Get index-page metadata (from pages collection)
 const indexPage = allPages.find(p => p.slug === 'index');
-const title = indexPage?.data.title || 'Clay';
+const title = indexPage?.data.title || 'Зарянка';
 const description = indexPage?.data.description;
+const heroImage = indexPage?.data.featuredimage || indexPage?.data.image;
+const heading = indexPage?.data.heading || 'Зарянка';
+const subheading = indexPage?.data.subheading || 'авторская керамика';
 
 let postCounter = 0;
 ---
 
 <Layout title={title} description={description}>
+    <Hero
+        image={heroImage}
+        heading={heading}
+        subheading={subheading}
+        ctaText="Посмотреть работы"
+        ctaHref="/work"
+    />
+
+    <section class="intro-section fade-in-section">
+        <p class="intro-text">
+            Авторская керамика ручной работы. Каждое изделие — единственное в своём роде,
+            сделано на гончарном круге с натуральными глазурями.
+        </p>
+    </section>
+
     <div class="post-feed">
         {posts.map((post) => {
             postCounter++;
-            // Calculate slug. If it's from 'pages', slug is just slug (or flattened).
-            // content/pages/bio.md -> slug 'bio'.
-            // content/work/work-1.md -> slug 'work-1'? No, in config.ts, work collection.
-            // But legacy mapped work/work-1.md -> /work/work-1
-            // My [...slug].astro will handle mapping.
-            // Here I need to generate the same link.
-
             let slug = post.slug;
             if (post.collection === 'work') slug = `work/${post.slug}`;
             if (post.collection === 'news') slug = `news/${post.slug}`;
             if (post.collection === 'sold') slug = `sold/${post.slug}`;
-            // Pages collection: 'bio' -> 'bio'.
-
-            // Wait, legacy slug split logic:
-            // src/pages/bio/index.md -> /bio.
-            // content/work/work-1.md -> /work/work-1.
 
             return (
                 <PostCard
@@ -60,3 +67,27 @@ let postCounter = 0;
         })}
     </div>
 </Layout>
+
+<style>
+.intro-section {
+    max-width: 680px;
+    margin: 0 auto 3rem;
+    text-align: center;
+    padding: 0 2rem;
+}
+
+.intro-text {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .intro-text {
+        font-size: 1.8rem;
+    }
+}
+</style>
