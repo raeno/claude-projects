@@ -38,7 +38,7 @@ podcast2obsidian/
 - **CLI framework:** Typer
 - **Audio download:** yt-dlp (supports Yandex Music, Apple Podcasts, YouTube, etc.)
 - **Transcription:** faster-whisper (local, model `large-v3` by default)
-- **LLM enrichment:** OpenAI API (model `gpt-4o-mini` by default)
+- **LLM enrichment:** OpenAI API (model `gpt-5.4-mini-2026-03-17` by default)
 - **Config format:** TOML
 - **Prompt templating:** Jinja2 variables in Markdown files, loaded via `importlib.resources`
 
@@ -50,7 +50,7 @@ Location: `~/.config/podcast2obsidian/config.toml`
 vault_path = "~/Obsidian/MyVault/Podcasts"
 whisper_model = "large-v3"
 openai_api_key = "sk-..."
-openai_model = "gpt-4o-mini"
+openai_model = "gpt-5.4-mini-2026-03-17"
 language = "ru"
 ```
 
