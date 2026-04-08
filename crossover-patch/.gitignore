@@ -1,0 +1,8 @@
+# Large build artifacts and source archives — do not commit
+*.tar
+*.tar.gz
+*.tar.xz
+build64/
+sources/
+wine-upstream/
+backup/
