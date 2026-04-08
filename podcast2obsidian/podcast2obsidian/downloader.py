@@ -58,10 +58,12 @@ def _fetch_subtitles_from_url(
         "writesubtitles": True,
         "writeautomaticsub": True,
         "subtitleslangs": [language, "en"],
+        "noplaylist": True,
+        "skip_download": True,
     }
 
     # Try with cookies first, then without
-    for use_cookies in ([cookies, None] if cookies else [None]):
+    for use_cookies in [cookies, None] if cookies else [None]:
         attempt_opts = dict(opts)
         if use_cookies:
             attempt_opts["cookiefile"] = str(use_cookies)
@@ -161,6 +163,7 @@ def download(
         "quiet": skip_download,
         "no_warnings": True,
         "noprogress": skip_download,
+        "noplaylist": True,
     }
 
     # Try with cookies first, then without
