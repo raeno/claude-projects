@@ -6,6 +6,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a personal collection of Claude Code projects and tools. Each subdirectory is an independent project with its own README and structure.
 
+## Commit Convention
+
+All commit messages MUST be prefixed with the project name in square brackets:
+
+```
+[podcast2obsidian] feat: add paragraph splitting by pause detection
+[yt-dlp-synchronize] fix: handle expired session token
+[zarianka.ru] chore: update dependencies
+```
+
+For changes outside any project (root CLAUDE.md, README, etc.):
+
+```
+[repo] docs: update project list
+```
+
 ## Projects
 
-- **`yt-dlp-synchronize/`** — yt-dlp extractor plugin for synchronize.ru (Rails/Turbo LMS, videos hosted on Kinescope). See its README for installation, authentication, and usage.
+- **`podcast2obsidian/`** — CLI tool: download podcasts, transcribe locally (mlx/faster-whisper), enrich with LLM (theses + references), save to Obsidian vault
+- **`yt-dlp-synchronize/`** — yt-dlp extractor plugin for synchronize.ru (Rails/Turbo LMS, videos hosted on Kinescope)
+- **`vladmikhailov.com/`** — Personal portfolio site for Vlad Mikhailov (Rails 8, Tailwind 4, Hotwire, pgvector RAG chatbot)
+- **`zarianka.ru/`** — Pottery studio website (Astro)
+- **`crossover-patch/`** — Crossover patching utilities
