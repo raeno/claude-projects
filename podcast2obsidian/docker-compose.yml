@@ -1,0 +1,13 @@
+services:
+  bot:
+    build: .
+    env_file: .env
+    volumes:
+      - ./cookies:/app/cookies
+      - bot-data:/root/.local/share/podcast2obsidian
+      - bot-cache:/root/.cache/podcast2obsidian
+    restart: unless-stopped
+
+volumes:
+  bot-data:
+  bot-cache:

@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+.git/
+.env
+cookies/
+tests/
+docs/
+*.md
+Makefile
+uv.lock

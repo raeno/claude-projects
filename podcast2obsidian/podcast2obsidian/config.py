@@ -15,6 +15,8 @@ DEFAULT_CONFIG = {
     "language": "ru",
     "hf_token": "",
     "server": "",
+    "telegram_bot_token": "",
+    "telegram_allowed_users": "",
 }
 
 DEFAULT_SERVERS = {
@@ -36,6 +38,8 @@ _ENV_MAP = {
     "HF_TOKEN": "hf_token",
     "OBSIDIAN_VAULT_PATH": "vault_path",
     "P2O_SERVER": "server",
+    "TELEGRAM_BOT_TOKEN": "telegram_bot_token",
+    "TELEGRAM_ALLOWED_USERS": "telegram_allowed_users",
 }
 
 

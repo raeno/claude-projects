@@ -12,7 +12,7 @@ else
   BACKEND ?= cpu
 endif
 
-.PHONY: install install-dev test lint format clean
+.PHONY: install install-dev install-bot test lint format bot clean
 
 install:
 	uv sync --extra $(BACKEND)
@@ -30,6 +30,13 @@ lint:
 
 format:
 	uv run ruff format podcast2obsidian/ tests/
+
+install-bot:
+	uv sync --extra cpu --extra bot --extra dev
+	@echo "Installed with cpu + bot + dev"
+
+bot:
+	uv run python -m podcast2obsidian.bot
 
 clean:
 	rm -rf .venv dist *.egg-info
