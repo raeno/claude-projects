@@ -4,9 +4,9 @@ import threading
 from pathlib import Path
 
 from rich.progress import (
+    BarColumn,
     Progress,
     SpinnerColumn,
-    BarColumn,
     TextColumn,
     TimeElapsedColumn,
 )
@@ -20,6 +20,39 @@ _MLX_MODEL_MAP = {
     "large-v3": "mlx-community/whisper-large-v3-mlx",
 }
 
+# Pause longer than this (seconds) between segments → new paragraph
+PAUSE_THRESHOLD = 1.5
+
+
+def _segments_to_paragraphs(segments: list[tuple[float, float, str]]) -> str:
+    """Convert timestamped segments into paragraphed text.
+
+    Args:
+        segments: list of (start, end, text) tuples, sorted by start time.
+
+    Returns:
+        Text with paragraph breaks where pauses exceed PAUSE_THRESHOLD.
+    """
+    if not segments:
+        return ""
+
+    paragraphs = []
+    current = [segments[0][2]]
+
+    for i in range(1, len(segments)):
+        prev_end = segments[i - 1][1]
+        curr_start = segments[i][0]
+        gap = curr_start - prev_end
+
+        if gap >= PAUSE_THRESHOLD:
+            paragraphs.append("".join(current).strip())
+            current = []
+
+        current.append(segments[i][2])
+
+    paragraphs.append("".join(current).strip())
+    return "\n\n".join(p for p in paragraphs if p)
+
 
 def _mlx_worker(audio_path, hf_repo, language, out_queue):
     """Run MLX transcription in a thread."""
@@ -32,7 +65,11 @@ def _mlx_worker(audio_path, hf_repo, language, out_queue):
             language=language,
             verbose=False,
         )
-        out_queue.put(("done", result["text"]))
+        # Extract segments with timestamps for paragraph splitting
+        segments = []
+        for seg in result.get("segments", []):
+            segments.append((seg["start"], seg["end"], seg["text"]))
+        out_queue.put(("done", segments))
     except Exception as e:
         out_queue.put(("error", e))
 
@@ -52,7 +89,7 @@ def _faster_whisper_worker(
         )
         out_queue.put(("duration", info.duration))
         for segment in segments:
-            out_queue.put(("segment", segment.end, segment.text))
+            out_queue.put(("segment", segment.start, segment.end, segment.text))
         out_queue.put(("done", ""))
     except Exception as e:
         out_queue.put(("error", e))
@@ -107,13 +144,18 @@ def _transcribe_mlx(audio_path: str, model_name: str, language: str) -> str:
             except queue.Empty:
                 continue
             if msg[0] == "done":
-                return msg[1].strip()
+                segments = msg[1]
+                return _segments_to_paragraphs(segments)
             if msg[0] == "error":
                 raise msg[1]
 
 
 def _transcribe_faster_whisper(
-    audio_path: str, model_name: str, language: str, compute_type: str, cpu_threads: int
+    audio_path: str,
+    model_name: str,
+    language: str,
+    compute_type: str,
+    cpu_threads: int,
 ) -> str:
     out_queue: queue.Queue = queue.Queue()
     worker = threading.Thread(
@@ -129,7 +171,7 @@ def _transcribe_faster_whisper(
         raise msg[1]
     duration = msg[1]
 
-    texts = []
+    segments = []
     with Progress(
         SpinnerColumn(),
         TextColumn("[bold blue]Transcribing (CPU)"),
@@ -148,8 +190,8 @@ def _transcribe_faster_whisper(
                 break
             if msg[0] == "error":
                 raise msg[1]
-            _, end, text = msg
-            texts.append(text)
+            _, start, end, text = msg
+            segments.append((start, end, text))
             progress.update(task, completed=end)
 
-    return "".join(texts).strip()
+    return _segments_to_paragraphs(segments)
