@@ -59,16 +59,22 @@ def _fetch_subtitles_from_url(
         "writeautomaticsub": True,
         "subtitleslangs": [language, "en"],
     }
-    if cookies:
-        opts["cookiefile"] = str(cookies)
 
-    try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-    except Exception:
-        return None
+    # Try with cookies first, then without
+    for use_cookies in ([cookies, None] if cookies else [None]):
+        attempt_opts = dict(opts)
+        if use_cookies:
+            attempt_opts["cookiefile"] = str(use_cookies)
+        try:
+            with yt_dlp.YoutubeDL(attempt_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+            result = _extract_subtitle_text(info, language)
+            if result:
+                return result
+        except Exception:
+            continue
 
-    return _extract_subtitle_text(info, language)
+    return None
 
 
 def _search_youtube_subtitles(
@@ -156,10 +162,23 @@ def download(
         "no_warnings": True,
         "noprogress": skip_download,
     }
-    if cookies:
-        opts["cookiefile"] = str(cookies)
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(url, download=not skip_download)
+
+    # Try with cookies first, then without
+    last_error = None
+    for use_cookies in ([cookies, None] if cookies else [None]):
+        attempt_opts = dict(opts)
+        if use_cookies:
+            attempt_opts["cookiefile"] = str(use_cookies)
+        try:
+            with yt_dlp.YoutubeDL(attempt_opts) as ydl:
+                info = ydl.extract_info(url, download=not skip_download)
+            last_error = None
+            break
+        except Exception as e:
+            last_error = e
+            continue
+    if last_error:
+        raise last_error
 
     if skip_download:
         # Use cached file from output_dir
