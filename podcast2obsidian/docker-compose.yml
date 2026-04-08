@@ -1,6 +1,6 @@
 services:
   bot:
-    build: .
+    image: ghcr.io/raeno/podcast2obsidian:latest
     env_file: .env
     volumes:
       - ./cookies:/app/cookies

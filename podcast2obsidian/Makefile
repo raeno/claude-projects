@@ -12,7 +12,7 @@ else
   BACKEND ?= cpu
 endif
 
-.PHONY: install install-dev install-bot test lint format bot clean
+.PHONY: install install-dev install-bot test lint format bot docker-build docker-push clean
 
 install:
 	uv sync --extra $(BACKEND)
@@ -37,6 +37,12 @@ install-bot:
 
 bot:
 	uv run python -m podcast2obsidian.bot
+
+docker-build:
+	docker build -t ghcr.io/raeno/podcast2obsidian:latest .
+
+docker-push: docker-build
+	docker push ghcr.io/raeno/podcast2obsidian:latest
 
 clean:
 	rm -rf .venv dist *.egg-info
