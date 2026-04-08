@@ -34,7 +34,9 @@ def test_enrich_calls_openai_and_parses_response(mock_openai_class):
     mock_response.choices = [MagicMock(message=mock_message)]
     mock_client.chat.completions.create.return_value = mock_response
 
-    result = enrich("transcript text", api_key="sk-test", model="gpt-5.4-mini-2026-03-17")
+    result = enrich(
+        "transcript text", api_key="sk-test", model="gpt-5.4-mini-2026-03-17"
+    )
 
     assert "Тезис первый" in result.theses
     assert "Test Book" in result.references

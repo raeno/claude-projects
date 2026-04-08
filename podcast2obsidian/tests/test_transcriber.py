@@ -1,34 +1,55 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from pathlib import Path
 from podcast2obsidian.transcriber import transcribe
 
 
-@patch("podcast2obsidian.transcriber.WhisperModel")
-def test_transcribe_returns_joined_text(mock_model_class):
-    mock_model = MagicMock()
-    mock_model_class.return_value = mock_model
+@patch("podcast2obsidian.transcriber._mlx_worker")
+def test_transcribe_mlx_backend(mock_worker):
+    def side_effect(audio_path, hf_repo, language, out_queue):
+        out_queue.put(("done", " Hello world. "))
 
-    # Simulate segments as named tuples with .text
-    segment1 = MagicMock()
-    segment1.text = "Hello world."
-    segment2 = MagicMock()
-    segment2.text = " This is a test."
+    mock_worker.side_effect = side_effect
 
-    mock_model.transcribe.return_value = ([segment1, segment2], MagicMock())
+    result = transcribe(
+        Path("/fake/audio.mp3"),
+        server_config={"backend": "mlx", "whisper_model": "tiny"},
+        language="en",
+    )
 
-    result = transcribe(Path("/fake/audio.mp3"), model_name="tiny", language="en")
-
-    assert result == "Hello world. This is a test."
-    mock_model_class.assert_called_once_with("tiny")
-    mock_model.transcribe.assert_called_once_with(str(Path("/fake/audio.mp3")), language="en")
+    assert result == "Hello world."
 
 
-@patch("podcast2obsidian.transcriber.WhisperModel")
-def test_transcribe_uses_default_model(mock_model_class):
-    mock_model = MagicMock()
-    mock_model_class.return_value = mock_model
-    mock_model.transcribe.return_value = ([], MagicMock())
+@patch("podcast2obsidian.transcriber._mlx_worker")
+def test_transcribe_defaults_to_mlx(mock_worker):
+    def side_effect(audio_path, hf_repo, language, out_queue):
+        out_queue.put(("done", "test"))
+
+    mock_worker.side_effect = side_effect
 
     transcribe(Path("/fake/audio.mp3"))
 
-    mock_model_class.assert_called_once_with("large-v3")
+    mock_worker.assert_called_once()
+
+
+@patch("podcast2obsidian.transcriber._faster_whisper_worker")
+def test_transcribe_faster_whisper_backend(mock_worker):
+    def side_effect(
+        audio_path, model_name, language, compute_type, cpu_threads, out_queue
+    ):
+        out_queue.put(("duration", 10.0))
+        out_queue.put(("done", ""))
+
+    mock_worker.side_effect = side_effect
+
+    result = transcribe(
+        Path("/fake/audio.mp3"),
+        server_config={
+            "backend": "faster-whisper",
+            "whisper_model": "large-v3",
+            "compute_type": "int8",
+            "cpu_threads": 6,
+        },
+        language="ru",
+    )
+
+    assert isinstance(result, str)

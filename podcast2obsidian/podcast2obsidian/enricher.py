@@ -29,6 +29,8 @@ def enrich(transcript: str, api_key: str, model: str) -> EnrichResult:
         messages=[{"role": "user", "content": prompt}],
     )
     content = response.choices[0].message.content
+    if not content:
+        return EnrichResult(theses="(LLM returned empty response)", references="")
 
     return _parse_response(content)
 

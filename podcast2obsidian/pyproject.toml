@@ -10,14 +10,16 @@ requires-python = ">=3.11"
 dependencies = [
     "typer>=0.9",
     "yt-dlp>=2024.0",
-    "faster-whisper>=1.0",
     "openai>=1.0",
     "jinja2>=3.0",
     "tomli-w>=1.0",
     "rich>=13.0",
+    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]
+mlx = ["mlx-whisper>=0.4"]
+cpu = ["faster-whisper>=1.0"]
 dev = [
     "pytest>=8.0",
     "pytest-tmp-files>=0.0.2",
@@ -25,3 +27,8 @@ dev = [
 
 [project.scripts]
 podcast2obsidian = "podcast2obsidian.cli:app"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.9",
+]

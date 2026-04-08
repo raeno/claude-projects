@@ -38,13 +38,25 @@ def test_config_set_updates_value():
 @patch("podcast2obsidian.cli.enrich")
 @patch("podcast2obsidian.cli.transcribe")
 @patch("podcast2obsidian.cli.download")
+@patch("podcast2obsidian.cli.fetch_subtitles", return_value=None)
+@patch(
+    "podcast2obsidian.cli.get_server_config",
+    return_value={"backend": "mlx", "whisper_model": "tiny"},
+)
 @patch("podcast2obsidian.cli.load_config")
 def test_process_runs_full_pipeline(
-    mock_config, mock_download, mock_transcribe, mock_enrich, mock_format, mock_save, tmp_path
+    mock_config,
+    mock_server_cfg,
+    mock_fetch_subs,
+    mock_download,
+    mock_transcribe,
+    mock_enrich,
+    mock_format,
+    mock_save,
+    tmp_path,
 ):
     mock_config.return_value = {
         "vault_path": str(tmp_path),
-        "whisper_model": "tiny",
         "openai_api_key": "sk-test",
         "openai_model": "gpt-5.4-mini-2026-03-17",
         "language": "ru",

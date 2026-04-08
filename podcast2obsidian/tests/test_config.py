@@ -1,16 +1,18 @@
-from pathlib import Path
+from unittest.mock import patch
 from podcast2obsidian.config import load_config, save_config, DEFAULT_CONFIG
 
 
 def test_default_config_has_required_keys():
     assert "vault_path" in DEFAULT_CONFIG
-    assert "whisper_model" in DEFAULT_CONFIG
     assert "openai_api_key" in DEFAULT_CONFIG
     assert "openai_model" in DEFAULT_CONFIG
     assert "language" in DEFAULT_CONFIG
+    assert "server" in DEFAULT_CONFIG
 
 
-def test_load_config_returns_defaults_when_no_file(tmp_path):
+@patch.dict("os.environ", {}, clear=True)
+@patch("podcast2obsidian.config.load_dotenv")
+def test_load_config_returns_defaults_when_no_file(mock_dotenv, tmp_path):
     config_path = tmp_path / "config.toml"
     config = load_config(config_path)
     assert config == DEFAULT_CONFIG
@@ -29,7 +31,8 @@ def test_load_config_merges_with_defaults(tmp_path):
     config_path = tmp_path / "config.toml"
     # Write a partial config (missing some keys)
     import tomli_w
+
     config_path.write_bytes(tomli_w.dumps({"vault_path": "/partial"}).encode("utf-8"))
     loaded = load_config(config_path)
     assert loaded["vault_path"] == "/partial"
-    assert loaded["whisper_model"] == DEFAULT_CONFIG["whisper_model"]
+    assert loaded["openai_model"] == DEFAULT_CONFIG["openai_model"]

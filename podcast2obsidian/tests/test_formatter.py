@@ -1,13 +1,16 @@
-from pathlib import Path
 from podcast2obsidian.formatter import format_note, save_note, slugify_title
 
 
 def test_slugify_title_cyrilllic():
-    assert slugify_title("Эпизод 1: Как жить?") == "epizod-1-kak-zhit"
+    assert slugify_title("Эпизод 1: Как жить?") == "Эпизод 1 Как жить"
 
 
 def test_slugify_title_english():
-    assert slugify_title("Episode 1: How to live?") == "episode-1-how-to-live"
+    assert slugify_title("Episode 1: How to live?") == "Episode 1 How to live"
+
+
+def test_slugify_title_removes_unsafe_chars():
+    assert slugify_title('Test "quotes" and <brackets>') == "Test quotes and brackets"
 
 
 def test_format_note_contains_all_sections():
@@ -19,9 +22,9 @@ def test_format_note_contains_all_sections():
         references='- **Книга:** "Test" — Author',
         transcript="Full transcript text here.",
     )
-    assert "title: \"Test Episode\"" in note
-    assert "podcast: \"Test Podcast\"" in note
-    assert "source: \"https://example.com\"" in note
+    assert 'title: "Test Episode"' in note
+    assert 'podcast: "Test Podcast"' in note
+    assert 'source: "https://example.com"' in note
     assert "## Основные тезисы" in note
     assert "- Thesis 1" in note
     assert "## Референсы" in note

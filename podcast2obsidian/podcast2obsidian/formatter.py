@@ -2,28 +2,14 @@ import re
 from datetime import date
 from pathlib import Path
 
-# Simple transliteration map for Cyrillic → Latin
-_TRANSLIT = {
-    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "yo",
-    "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
-    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
-    "ф": "f", "х": "kh", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "shch",
-    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
-}
-
 
 def slugify_title(title: str) -> str:
-    """Convert title to a filesystem-safe slug with transliteration."""
-    result = []
-    for ch in title.lower():
-        if ch in _TRANSLIT:
-            result.append(_TRANSLIT[ch])
-        elif ch.isascii() and ch.isalnum():
-            result.append(ch)
-        else:
-            result.append(" ")
-    slug = "-".join("".join(result).split())
-    return re.sub(r"-+", "-", slug).strip("-")
+    """Convert title to a filesystem-safe name, preserving Cyrillic."""
+    # Remove characters unsafe for filesystems
+    slug = re.sub(r'[<>:"/\\|?*]', "", title)
+    # Collapse whitespace
+    slug = " ".join(slug.split())
+    return slug.strip(". ")
 
 
 def format_note(
@@ -36,11 +22,13 @@ def format_note(
 ) -> str:
     """Assemble the full Markdown note with YAML frontmatter."""
     today = date.today().isoformat()
+    esc_title = title.replace('"', '\\"')
+    esc_podcast = podcast_name.replace('"', '\\"')
     return f"""---
-title: "{title}"
+title: "{esc_title}"
 source: "{source_url}"
 date_processed: {today}
-podcast: "{podcast_name}"
+podcast: "{esc_podcast}"
 ---
 
 ## Основные тезисы

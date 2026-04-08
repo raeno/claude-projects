@@ -39,4 +39,6 @@ def test_download_calls_ytdlp_and_returns_result(mock_ydl_class, tmp_path):
     assert result.podcast_name == "Podcast Name"
     assert result.source_url == "https://example.com/ep"
     assert result.audio_path == tmp_path / "audio.mp3"
-    mock_ydl.extract_info.assert_called_once_with("https://example.com/ep", download=True)
+    mock_ydl.extract_info.assert_called_once_with(
+        "https://example.com/ep", download=True
+    )
