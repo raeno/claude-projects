@@ -28,3 +28,4 @@ For changes outside any project (root CLAUDE.md, README, etc.):
 - **`yt-dlp-synchronize/`** — yt-dlp extractor plugin for synchronize.ru (Rails/Turbo LMS, videos hosted on Kinescope)
 - **`zarianka.ru/`** — Pottery studio website (Astro)
 - **`crossover-patch/`** — Crossover patching utilities
+- **`iphotos-cleanup/`** — CLI: find photos imported by junk apps (carsharing etc.) in macOS Photos via Photos.sqlite, collect into an album for manual deletion
